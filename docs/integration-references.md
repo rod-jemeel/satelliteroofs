@@ -11,4 +11,4 @@ These official documents describe external contracts, not guarantees of account 
 - [OpenAI web search](https://developers.openai.com/api/docs/guides/tools-web-search) — supplier research with consulted source links.
 - [ChatGPT plan limitations](https://developers.openai.com/siwc/token-sharing-open-source/preview-limitations) — eligibility and supported request options vary by account/model.
 
-The Codex app-server adapter is disabled; its example configuration is retained for reference only. JobNimbus is currently mocked. See [implementation limits](limitations.md) before describing these capabilities to a customer or deploying the app.
+The Codex app-server adapter is disabled. JobNimbus is currently mocked. See [implementation limits](limitations.md) before describing these capabilities to a customer or deploying the app.

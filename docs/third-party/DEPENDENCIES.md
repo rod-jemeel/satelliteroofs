@@ -1,6 +1,6 @@
 # Third-party notices
 
-Dependency versions are retained in `package-lock.json`, `apps/web/package-lock.json`, `requirements.txt` ; local verification is summarized in `docs/limitations.md`.
+Dependency versions are retained in `package-lock.json`, `apps/web/package-lock.json`, `requirements.txt`; local verification is summarized in `docs/limitations.md`.
 
 - The copied PDF.js browser worker is Apache-2.0 licensed. Its full license is retained in `PDFJS-LICENSE.txt`; keep that file with redistributions.
 - Embedded PostgreSQL's JavaScript wrapper is MIT licensed; its package license is retained alongside this file. The Windows binary package's supplied license is also copied here. PostgreSQL and bundled native libraries retain their upstream notices in installed dependency packages.

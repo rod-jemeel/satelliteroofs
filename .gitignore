@@ -43,3 +43,8 @@ Thumbs.db
 .pypirc
 .coverage
 htmlcov/
+
+# Local agent instructions and retired development references
+apps/web/AGENTS.md
+docs/support-matrix.md
+docs/codex-app-server.toml.example
