@@ -1,0 +1,45 @@
+# Dependencies and generated builds
+node_modules/
+.next/
+.venv*/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+*.tsbuildinfo
+next-env.d.ts
+
+# Local credentials, databases, uploaded documents, provider usage and logs
+.runtime/
+.env
+.env.*
+!.env.example
+*.protected
+*.key
+*.pem
+*.p12
+*.pfx
+*.db
+*.db-*
+*.sqlite*
+*.log
+
+# Development captures and machine-specific work
+verification/
+test-results/
+playwright-report/
+.taste-skill/
+tmp/
+work/
+verification-*.png
+docs/verification.md
+docs/specification.txt
+docs/superpowers/
+.DS_Store
+Thumbs.db
+
+/Start RoofReady.cmd
+
+.npmrc
+.pypirc
+.coverage
+htmlcov/

@@ -1,0 +1,40 @@
+'use client';
+import {useEffect,useRef,useState} from 'react';
+import {ZoomIn,ZoomOut,RotateCcw,ExternalLink,ChevronLeft,ChevronRight,Hand,SquarePen,FileText} from 'lucide-react';
+import type {PDFDocumentProxy} from 'pdfjs-dist';
+import type {Page,Observation,Annotation} from '../lib/types';
+
+export default function PdfViewer({documentId,pages,observation,annotations,onAnnotate,drawingsOnly=false,sourceRequest=0}:{documentId:string;pages:Page[];observation?:Observation;annotations:Annotation[];onAnnotate:(page:number,bbox:number[],label:string)=>Promise<void>;drawingsOnly?:boolean;sourceRequest?:number}){
+ const [pdf,setPdf]=useState<PDFDocumentProxy|null>(null),[page,setPage]=useState(1),[zoom,setZoom]=useState(1),[error,setError]=useState(''),[mode,setMode]=useState<'select'|'pan'|'annotate'>('select'),[drawing,setDrawing]=useState<number[]|null>(null),[pending,setPending]=useState<number[]|null>(null),[label,setLabel]=useState(''),[rendering,setRendering]=useState(false);
+ const canvas=useRef<HTMLCanvasElement>(null),scroller=useRef<HTMLDivElement>(null),sheet=useRef<HTMLDivElement>(null),origin=useRef<{x:number;y:number;left:number;top:number}|null>(null),[width,setWidth]=useState(650);
+ useEffect(()=>{let doc:PDFDocumentProxy|undefined;let alive=true;let cancel:()=>void=()=>{};
+  import('pdfjs-dist').then(async lib=>{lib.GlobalWorkerOptions.workerSrc='/pdf.worker.min.mjs';const loading=lib.getDocument({url:`/api/v1/documents/${documentId}/content`,isEvalSupported:false,enableXfa:false,withCredentials:true});cancel=()=>{void loading.destroy()};const loaded=await loading.promise;doc=loaded;if(alive){setPdf(loaded);setPage(1);setError('');}}).catch(()=>{if(alive)setError('The PDF could not be displayed. Open the original report or enter measurements manually.');});
+  return()=>{alive=false;cancel();if(doc)void doc.destroy();};
+ },[documentId]);
+ useEffect(()=>{const e=observation?.evidence[0];if(e){setPage(e.page_number);setZoom(1)}},[observation?.id,sourceRequest]);
+ useEffect(()=>{if(drawingsOnly){const drawing=pages.find(p=>p.classification.includes('diagram'));if(drawing)setPage(drawing.page_number)}},[drawingsOnly,pages]);
+ useEffect(()=>{if(!scroller.current)return;const obs=new ResizeObserver(entries=>setWidth(Math.max(280,entries[0].contentRect.width-64)));obs.observe(scroller.current);return()=>obs.disconnect()},[]);
+ const manifest=pages[page-1];const ratio=manifest?manifest.height/manifest.width:1.294;
+ useEffect(()=>{if(!pdf||!canvas.current)return;let stopped=false;let task:{cancel:()=>void;promise:Promise<void>}|undefined;setRendering(true);
+  pdf.getPage(page).then(p=>{if(stopped||!canvas.current)return;const scale=width*zoom/p.getViewport({scale:1}).width;const viewport=p.getViewport({scale:scale*window.devicePixelRatio});const c=canvas.current;c.width=viewport.width;c.height=viewport.height;task=p.render({canvas:c,viewport});return task.promise;}).then(()=>{if(!stopped)setRendering(false)}).catch(e=>{if(!stopped&&e.name!=='RenderingCancelledException'){setError('Page rendering failed. Try opening the original report.');setRendering(false)}});
+  return()=>{stopped=true;task?.cancel()};
+ },[pdf,page,width,zoom]);
+ const position=(e:React.PointerEvent)=>{const r=sheet.current!.getBoundingClientRect();return [Math.max(0,Math.min(1,(e.clientX-r.left)/r.width)),Math.max(0,Math.min(1,(e.clientY-r.top)/r.height))]};
+ const active=observation?.evidence.filter(e=>e.page_number===page)||[];
+ return <div className="pdf-shell">
+   <div className="viewer-tools"><div className="tool-group"><button aria-label="Previous page" disabled={page<=1} onClick={()=>setPage(p=>p-1)}><ChevronLeft size={16}/></button><select aria-label="Report page" value={page} onChange={e=>setPage(Number(e.target.value))}>{pages.map(p=><option key={p.page_number} value={p.page_number}>Page {p.page_number} · {p.classification.replaceAll('_',' ')}</option>)}</select><button aria-label="Next page" disabled={page>=pages.length} onClick={()=>setPage(p=>p+1)}><ChevronRight size={16}/></button></div><div className="tool-group"><button aria-label="Zoom out" onClick={()=>setZoom(z=>Math.max(.5,z-.2))}><ZoomOut size={17}/></button><span>{Math.round(zoom*100)}%</span><button aria-label="Zoom in" onClick={()=>setZoom(z=>Math.min(3,z+.2))}><ZoomIn size={17}/></button><button aria-label="Reset view" onClick={()=>{setZoom(1);scroller.current?.scrollTo(0,0)}}><RotateCcw size={16}/></button></div><div className="tool-group"><button title="Pan page" aria-label="Pan page" aria-pressed={mode==='pan'} onClick={()=>setMode(mode==='pan'?'select':'pan')}><Hand size={16}/></button><button title="Add annotation" aria-label="Add annotation" aria-pressed={mode==='annotate'} onClick={()=>setMode(mode==='annotate'?'select':'annotate')}><SquarePen size={16}/></button><a href={`/api/v1/documents/${documentId}/content`} target="_blank" rel="noreferrer" aria-label="Open original PDF"><ExternalLink size={16}/></a></div></div>
+   {drawingsOnly&&!pages.some(p=>p.classification.includes('diagram'))&&<div className="notice">No roof drawing found. Choose a source page manually below.</div>}
+   {mode==='annotate'&&<div className="notice">Drag a rectangle on the page, then give the annotation a label. It will not change any measurements.</div>}
+   {error?<div className="empty"><FileText/><h3>Report preview unavailable</h3><p>{error}</p></div>:<div className={`pdf-scroll ${mode}`} ref={scroller} onPointerDown={e=>{if(mode==='pan'&&scroller.current){origin.current={x:e.clientX,y:e.clientY,left:scroller.current.scrollLeft,top:scroller.current.scrollTop};e.currentTarget.setPointerCapture(e.pointerId)}}} onPointerMove={e=>{if(mode==='pan'&&origin.current&&scroller.current){scroller.current.scrollLeft=origin.current.left-(e.clientX-origin.current.x);scroller.current.scrollTop=origin.current.top-(e.clientY-origin.current.y)}}} onPointerUp={()=>{if(mode==='pan')origin.current=null}}>
+     <div className="pdf-page" ref={sheet} style={{width:width*zoom,height:width*zoom*ratio}} onPointerDown={e=>{if(mode==='annotate'){const [x,y]=position(e);setDrawing([x,y,x,y]);e.currentTarget.setPointerCapture(e.pointerId)}}} onPointerMove={e=>{if(mode==='annotate'&&drawing){const [x,y]=position(e);setDrawing([drawing[0],drawing[1],x,y])}}} onPointerUp={()=>{if(drawing){const b=[Math.min(drawing[0],drawing[2]),Math.min(drawing[1],drawing[3]),Math.max(drawing[0],drawing[2]),Math.max(drawing[1],drawing[3])];if(b[2]-b[0]>.01&&b[3]-b[1]>.005)setPending(b);setDrawing(null)}}}>
+       <canvas ref={canvas} style={{width:'100%',height:'100%'}}/>
+       {active.map((e,i)=><div data-testid="evidence-highlight" className="evidence-highlight" key={i} style={box(e.bbox_normalized)}><span>Source evidence</span></div>)}
+       {annotations.filter(a=>a.document_id===documentId&&a.page_number===page).map(a=><div key={a.id} className="annotation-highlight" style={box(a.bbox)} title={a.label}><span>{a.label}</span></div>)}
+       {drawing&&<div className="annotation-highlight" style={box([Math.min(drawing[0],drawing[2]),Math.min(drawing[1],drawing[3]),Math.max(drawing[0],drawing[2]),Math.max(drawing[1],drawing[3])])}/>}
+     </div>{rendering&&<div className="render-indicator">Rendering source page…</div>}
+   </div>}
+   <div className="viewer-footer"><span><i className="legend-blue"/> Source evidence <i className="legend-amber"/> Your annotation</span><span>Original report · page {page} of {pages.length||'—'}</span></div>
+   {pending&&<div className="annotation-form"><input aria-label="Annotation label" placeholder="Annotation label" value={label} onChange={e=>setLabel(e.target.value)}/><button className="primary" disabled={!label.trim()} onClick={async()=>{await onAnnotate(page,pending,label);setPending(null);setLabel('');setMode('select')}}>Save annotation</button><button onClick={()=>setPending(null)}>Cancel</button></div>}
+ </div>
+}
+function box(b:number[]):React.CSSProperties{return {left:`${b[0]*100}%`,top:`${b[1]*100}%`,width:`${(b[2]-b[0])*100}%`,height:`${(b[3]-b[1])*100}%`}}

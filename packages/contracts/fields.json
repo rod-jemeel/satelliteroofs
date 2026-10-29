@@ -1,0 +1,57 @@
+{
+  "roof_area": {
+    "name": "Roof surface area",
+    "unit": "ft2",
+    "required": true
+  },
+  "ridge_length": {
+    "name": "Ridge",
+    "unit": "ft",
+    "required": false
+  },
+  "hip_length": {
+    "name": "Hip",
+    "unit": "ft",
+    "required": false
+  },
+  "ridge_hip_length": {
+    "name": "Ridge + hip",
+    "unit": "ft",
+    "required": true
+  },
+  "valley_length": {
+    "name": "Valley",
+    "unit": "ft",
+    "required": true
+  },
+  "eave_length": {
+    "name": "Eaves",
+    "unit": "ft",
+    "required": true
+  },
+  "rake_length": {
+    "name": "Rakes",
+    "unit": "ft",
+    "required": true
+  },
+  "step_flashing_length": {
+    "name": "Step flashing",
+    "unit": "ft",
+    "required": false
+  },
+  "headwall_length": {
+    "name": "Headwall flashing",
+    "unit": "ft",
+    "required": false
+  },
+  "penetration_count": {
+    "name": "Pipe penetrations",
+    "unit": "count",
+    "required": false
+  },
+  "facet_pitch": {
+    "name": "Reported pitch",
+    "unit": "pitch",
+    "required": false
+  }
+}

@@ -1,0 +1,15 @@
+fastapi==0.135.1
+uvicorn==0.41.0
+sqlalchemy==2.0.48
+alembic==1.18.4
+psycopg[binary]==3.2.13
+python-multipart==0.0.22
+pdfplumber==0.11.9
+pypdfium2==5.5.0
+reportlab==4.4.10
+httpx==0.28.1
+PyJWT[crypto]==2.12.1
+cryptography==46.0.5
+pytest==9.0.2
+pydantic==2.12.5
+shapely==2.1.2

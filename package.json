@@ -1,0 +1,22 @@
+{
+  "name": "satelliteroofs-local",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "node scripts/run.mjs",
+    "web": "npm --prefix apps/web run dev",
+    "build": "npm --prefix apps/web run build",
+    "typecheck": "npm --prefix apps/web run typecheck",
+    "test:e2e": "playwright test",
+    "test:geometry": "node --experimental-strip-types --test tests/buildings.test.mjs",
+    "demo:record": "node scripts/record-demo.mjs"
+  },
+  "dependencies": {
+    "embedded-postgres": "17.10.0-beta.17"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.58.2",
+    "geojson-vt": "^4.0.2",
+    "vt-pbf": "^3.1.3"
+  }
+}

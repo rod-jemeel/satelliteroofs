@@ -1,0 +1,8 @@
+'use client';
+import {Calculator,FolderOpen,Map,Menu,Plus,Settings2} from 'lucide-react';
+import {Button} from '@/components/ui/button';
+import {DropdownMenu,DropdownMenuContent,DropdownMenuGroup,DropdownMenuItem,DropdownMenuLabel,DropdownMenuSeparator,DropdownMenuTrigger} from '@/components/ui/dropdown-menu';
+import type {Project} from '@/lib/types';
+export default function WorkspaceMenu({projects,hasProject,disabled=false,onMap,onProjects,onSelect,onNew,onSettings,onEstimate}:{projects:Project[];hasProject:boolean;disabled?:boolean;onMap:()=>void;onProjects:()=>void;onSelect:(id:string)=>void;onNew:()=>void;onSettings:()=>void;onEstimate:()=>void}){
+ return <DropdownMenu><DropdownMenuTrigger asChild><Button variant="ghost" size="icon" aria-label="Open workspace menu" disabled={disabled}><Menu/></Button></DropdownMenuTrigger><DropdownMenuContent align="start" className="workspace-menu"><DropdownMenuLabel>Workspace</DropdownMenuLabel><DropdownMenuGroup><DropdownMenuItem onSelect={onMap}><Map/>Property map</DropdownMenuItem><DropdownMenuItem onSelect={onProjects}><FolderOpen/>Projects</DropdownMenuItem><DropdownMenuItem onSelect={onNew}><Plus/>New project</DropdownMenuItem><DropdownMenuItem disabled={!hasProject} onSelect={onEstimate}><Calculator/>Current estimate</DropdownMenuItem><DropdownMenuItem onSelect={onSettings}><Settings2/>Settings</DropdownMenuItem></DropdownMenuGroup>{projects.length>0&&<><DropdownMenuSeparator/><DropdownMenuLabel>Recent roofs</DropdownMenuLabel><DropdownMenuGroup>{projects.slice(0,6).map(project=><DropdownMenuItem key={project.id} onSelect={()=>onSelect(project.id)}><span className="truncate">{project.name}</span></DropdownMenuItem>)}</DropdownMenuGroup></>}</DropdownMenuContent></DropdownMenu>
+}
