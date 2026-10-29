@@ -1,8 +1,10 @@
 <div align="center">
-  <img src="apps/web/public/satelliteroofs-logo.png" alt="SatelliteRoofs" width="420" />
+  <h1>SatelliteRoofs</h1>
   <p><strong>From a roofing report to a reviewed, explainable estimate.</strong></p>
   <p>Python · FastAPI · Next.js · PostgreSQL · PDF processing</p>
 </div>
+
+[![Checks](https://github.com/rod-jemeel/satelliteroofs/actions/workflows/ci.yml/badge.svg)](https://github.com/rod-jemeel/satelliteroofs/actions/workflows/ci.yml)
 
 SatelliteRoofs is a local-first roofing measurement review and estimating prototype. It brings the original PDF, extracted measurements, human corrections, material calculations and estimate revisions into one workspace. An optional satellite map supports preliminary roof sketches and layered budgets.
 
