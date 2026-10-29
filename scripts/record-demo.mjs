@@ -1,5 +1,6 @@
 // Records the real local PDF workflow with synthetic data and no external calls.
 import {chromium,expect} from '@playwright/test';
+import {spawnSync} from 'node:child_process';
 import {mkdir,copyFile} from 'node:fs/promises';
 import path from 'node:path';
 import {fileURLToPath} from 'node:url';
@@ -95,6 +96,9 @@ try{
  console.log(JSON.stringify({workflow:'upload-review-verify-estimate-approve-export',external_requests_blocked:blocked,paid_provider_calls:0}));
 }finally{
  const video=page.video();await context.close();
- if(video&&completed)await copyFile(await video.path(),path.join(media,'walkthrough.webm'));
+ if(video&&completed){
+  await copyFile(await video.path(),path.join(media,'walkthrough.webm'));
+  if(process.env.FFMPEG_PATH){const converted=spawnSync(process.env.FFMPEG_PATH,['-hide_banner','-loglevel','error','-y','-i',path.join(media,'walkthrough.webm'),'-c:v','libx264','-pix_fmt','yuv420p','-crf','23','-movflags','+faststart',path.join(media,'walkthrough.mp4')],{stdio:'inherit',windowsHide:true});if(converted.status!==0)throw new Error('MP4 conversion failed; the original WebM is preserved.');}
+ }
  await browser.close();
 }

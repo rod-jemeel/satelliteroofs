@@ -8,3 +8,5 @@
 apps/web/public/pdf.worker.min.mjs linguist-vendored=true
 packages/contracts/api.d.ts linguist-generated=true
 packages/contracts/openapi.json linguist-generated=true
+
+*.mp4 binary

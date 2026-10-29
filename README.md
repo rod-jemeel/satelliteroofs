@@ -10,7 +10,7 @@ SatelliteRoofs is a local-first roofing measurement review and estimating protot
 
 **Status:** working prototype, not a production quoting service. The screenshots and recorded PDF walkthrough use synthetic report data and demonstration prices. Real measurement-provider reports have not yet been validated.
 
-[Watch the recorded walkthrough](https://raw.githubusercontent.com/rod-jemeel/satelliteroofs/main/docs/media/walkthrough.webm) · [Sample PDF](fixtures/demo-roof-report.pdf) · [Architecture](docs/architecture.md) · [Known limits](docs/limitations.md)
+[Watch the recorded walkthrough](https://raw.githubusercontent.com/rod-jemeel/satelliteroofs/main/docs/media/walkthrough.mp4) · [Sample PDF](fixtures/demo-roof-report.pdf) · [Architecture](docs/architecture.md) · [Known limits](docs/limitations.md)
 
 ![SatelliteRoofs map workspace](docs/media/map-workspace.png)
 
@@ -87,6 +87,8 @@ npm.cmd run test:e2e
 # Record the synthetic PDF walkthrough without external calls:
 npm.cmd run demo:record
 ```
+
+The recorder writes WebM. Set `FFMPEG_PATH` to an existing FFmpeg executable with H.264 support to also produce the shareable MP4.
 
 Browser tests stub Mapbox and AI responses and create their own synthetic projects. Backend tests use a separate SQLite test database. GitHub Actions checks backend tests, geometry tests and the frontend build. Provider acceptance and clean installation remain separate from unit-test results; see [limitations](docs/limitations.md).
 
